@@ -1,0 +1,32 @@
+ant.importBuild '../ant/build.xml'
+
+[antinit, antcompile, antdist]*.logging*.level = LogLevel.INFO
+
+antinit {
+    doFirst {
+        logger.quiet "Deleting the directory '${ant.properties.build}'."
+    }
+
+    doLast {
+        logger.quiet "Starting from a clean slate."
+    }
+}
+
+ext.buildDir = '../ant/build'
+ant.properties.build = "../ant/classes"
+ant.properties.dist = "../ant/libs"
+
+task sourcesJar(type: Jar) {
+    baseName = 'my-app'
+    classifier = 'sources'
+    version = ant.properties.version
+    destinationDir = file(ant.properties.dist)
+    from new File(ant.properties.src, 'main/java')
+}
+
+antdist.dependsOn sourcesJar
+
+antcompile {
+    inputs.dir file(ant.properties.src)
+    outputs.dir file(ant.properties.build)
+}
